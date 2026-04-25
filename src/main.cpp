@@ -1,14 +1,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-
 #include <spdlog/spdlog.h>
-
 #include "FileWatch.hpp"
+
 #include "util.hpp"
+#include "program.hpp"
+#include "program_pipeline.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
@@ -82,17 +82,15 @@ int main()
 
   glClearColor(0.15, 0.15, 0.15, 1);
 
-  uint32_t vs, fs;
+  std::optional<Program> vert_prog, frag_prog;
+
   try
   {
-    auto vertexSource = readFile("../shaders/test.vert");
-    auto fragmentSource = readFile("../shaders/test.frag");
+    auto vert_src = readFile("shaders/test.vert");
+    auto frag_src = readFile("shaders/test.frag");
 
-    auto vPtr = vertexSource.c_str();
-    auto fPtr = fragmentSource.c_str();
-
-    vs = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &vPtr);
-    fs = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &fPtr);
+    vert_prog.emplace(ShaderType::Vertex, vert_src);
+    frag_prog.emplace(ShaderType::Fragment, frag_src);
   }
   catch (const std::exception &e)
   {
@@ -100,42 +98,15 @@ int main()
     return EXIT_FAILURE;
   }
 
-  int32_t success;
-  glGetProgramiv(vs, GL_LINK_STATUS, &success);
-  if (!success)
-  {
-    int32_t len;
-    glGetProgramiv(vs, GL_INFO_LOG_LENGTH, &len);
+  ProgramPipeline ppline;
+  ppline.setBit(*vert_prog);
+  ppline.setBit(*frag_prog);
 
-    std::vector<char> log(len);
-    glGetProgramInfoLog(vs, len, nullptr, log.data());
-    spdlog::error("Vertex shader could not be compile: {}", log.data());
-    return EXIT_FAILURE;
-  }
+  ppline.bind();
 
-  glGetProgramiv(fs, GL_LINK_STATUS, &success);
-  if (!success)
-  {
-    int32_t len;
-    glGetProgramiv(fs, GL_INFO_LOG_LENGTH, &len);
-
-    std::vector<char> log(len);
-    glGetProgramInfoLog(fs, len, nullptr, log.data());
-    spdlog::error("Fragment shader could not be compile: {}", log.data());
-    return EXIT_FAILURE;
-  }
-
-  uint32_t pipeline;
-  glCreateProgramPipelines(1, &pipeline);
-
-  glUseProgramStages(pipeline, GL_VERTEX_SHADER_BIT, vs);
-  glUseProgramStages(pipeline, GL_FRAGMENT_SHADER_BIT, fs);
-
-  glBindProgramPipeline(pipeline);
-
-  bool reload;
+  bool reload = false;
   filewatch::FileWatch<std::string> watch(
-      "../shaders/test.frag",
+      "shaders/test.frag",
       [&reload](const std::string &path, const filewatch::Event change_type)
       {
         if (change_type == filewatch::Event::modified)
@@ -159,52 +130,35 @@ int main()
 
   glBindVertexArray(vao);
 
-  float angle;
-
-  auto rotUni = glGetUniformLocation(vs, "rot");
+  float angle = 0.0f;
+  int rotUni = vert_prog->getUniformLocation("rot");
 
   spdlog::info("Main loop ...");
   while (!glfwWindowShouldClose(window))
   {
-    glProgramUniformMatrix2fv(vs, rotUni, 1, false, rotate(angle).data());
+    vert_prog->setUniformMatrix2fv(rotUni, rotate(angle).data());
 
     if (reload)
     {
-      uint32_t s;
       try
       {
-        auto source = readFile("../shaders/test.frag");
-        auto ptr = source.c_str();
-        s = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &ptr);
+        auto source = readFile("shaders/test.frag");
+        // Dispose of the old program and create a new one
+        frag_prog.reset();
+        frag_prog.emplace(ShaderType::Fragment, source);
+        ppline.setBit(*frag_prog);
+        spdlog::info("Fragment shader reloaded successfully");
       }
       catch (const std::exception &e)
       {
-        spdlog::error(e.what());
-      }
-
-      int32_t success;
-      glGetProgramiv(s, GL_LINK_STATUS, &success);
-      if (!success)
-      {
-        int32_t len;
-        glGetProgramiv(s, GL_INFO_LOG_LENGTH, &len);
-
-        std::vector<char> log(len);
-        glGetProgramInfoLog(s, len, nullptr, log.data());
-        spdlog::error("Fragment shader could not be compile: {}", log.data());
-      }
-      else
-      {
-        glDeleteProgram(fs);
-        glUseProgramStages(pipeline, GL_FRAGMENT_SHADER_BIT, s);
-        fs = s;
+        spdlog::error("Fragment shader reload failed: {}", e.what());
       }
       reload = false;
     }
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glDrawArrays(GL_QUADS, 0, std::size(vertices) / 3);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, std::size(vertices) / 3);
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
