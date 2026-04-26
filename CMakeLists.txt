@@ -18,5 +18,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE include vendor/filewatch)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw spdlog::spdlog_header_only glad imgui)
 
-# Copy shaders to build directory
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# Create a symbolic link to shaders directory for hot-reload
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/shaders")
+    file(CREATE_LINK "${CMAKE_CURRENT_SOURCE_DIR}/shaders" "${CMAKE_CURRENT_BINARY_DIR}/shaders" SYMBOLIC)
+endif()
