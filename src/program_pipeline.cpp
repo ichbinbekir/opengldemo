@@ -15,7 +15,7 @@ ProgramPipeline::~ProgramPipeline()
   glDeleteProgramPipelines(1, &m_id);
 }
 
-void ProgramPipeline::useStages(const Program &program, std::initializer_list<ShaderType> stages) const
+void ProgramPipeline::useStages(const Program &program, const std::vector<ShaderType> &stages) const
 {
   if (!program.isSeparable())
   {
@@ -27,7 +27,7 @@ void ProgramPipeline::useStages(const Program &program, std::initializer_list<Sh
     throw std::runtime_error("Program does not have required shaders");
   }
 
-  uint32_t bits = 0;
+  GLbitfield bits = 0;
   for (auto stage : stages)
   {
     switch (stage)
@@ -50,3 +50,4 @@ void ProgramPipeline::bind() const
 {
   glBindProgramPipeline(m_id);
 }
+

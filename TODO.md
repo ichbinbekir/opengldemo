@@ -2,8 +2,7 @@
 ## kapanırken handle ların kapatılması lazım
 # imgui şuanlık rastgele yazıldı çalışması için, düzgün entegre edilmeli
 
-### yapıların sınıflara ayrılması lazım
+### yapıların sınıflara ayrılması lazım (vao, vbo vb.)
 # pch tanımlanabilir
-#### shaderların hotreloadı için asset manager lazım
 ## sınıfların kopyalanmalarını önlemek lazım
 ## program sınıfına uniformları esnek yönetebilecek farklı bi yapı ekle

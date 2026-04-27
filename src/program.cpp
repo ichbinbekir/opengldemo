@@ -16,7 +16,7 @@ Program::~Program()
   glDeleteProgram(m_id);
 }
 
-void Program::link(bool separable, std::initializer_list<std::reference_wrapper<const Shader>> shaders)
+void Program::link(bool separable, const std::vector<std::reference_wrapper<const Shader>> &shaders)
 {
   if (isSeparable() != separable)
   {
@@ -63,7 +63,7 @@ void Program::link(bool separable, std::initializer_list<std::reference_wrapper<
   }
 }
 
-void Program::detach(std::initializer_list<ShaderType> types)
+void Program::detach(const std::vector<ShaderType> &types)
 {
   for (auto type : types)
   {
@@ -91,7 +91,7 @@ void Program::setUniformMatrix2fv(int location, const float *data, uint32_t coun
   glProgramUniformMatrix2fv(m_id, location, count, transpose, data);
 }
 
-bool Program::hasShaders(std::initializer_list<ShaderType> types) const
+bool Program::hasShaders(const std::vector<ShaderType> &types) const
 {
   for (const auto &type : types)
   {

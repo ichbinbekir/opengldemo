@@ -22,8 +22,8 @@ public:
   Program();
   ~Program();
 
-  void link(bool separable, std::initializer_list<std::reference_wrapper<const Shader>> shaders);
-  void detach(std::initializer_list<ShaderType> types);
+  void link(bool separable, const std::vector<std::reference_wrapper<const Shader>> &shaders);
+  void detach(const std::vector<ShaderType> &types);
   void use() const;
 
   uint32_t getUniformLocation(const std::string &name) const;
@@ -31,6 +31,6 @@ public:
 
   uint32_t getID() const { return m_id; }
   bool isSeparable() const { return m_separable; };
-  bool hasShaders(std::initializer_list<ShaderType> types) const;
+  bool hasShaders(const std::vector<ShaderType> &types) const;
   std::vector<ShaderType> getAttachedTypes() const;
 };

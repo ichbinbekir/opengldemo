@@ -39,7 +39,7 @@ Shader::~Shader()
   glDeleteShader(m_id);
 }
 
-void Shader::compile(std::initializer_list<std::string_view> source) const
+void Shader::compile(const std::vector<std::string_view> &source) const
 {
   auto len = source.size();
   std::vector<const char *> ptrs;
