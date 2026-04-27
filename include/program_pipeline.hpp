@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+enum class ShaderType;
+
 class Program;
 
 class ProgramPipeline
@@ -12,7 +14,8 @@ public:
   ProgramPipeline();
   ~ProgramPipeline();
 
-  uint32_t getID() const { return m_id; }
-  void setBit(const Program &program) const;
+  void useStages(const Program &program, std::initializer_list<ShaderType> stages) const;
   void bind() const;
+  
+  uint32_t getID() const { return m_id; }
 };

@@ -1,5 +1,7 @@
 #include "program_pipeline.hpp"
 #include "program.hpp"
+#include "shader.hpp"
+#include <stdexcept>
 
 #include <glad/glad.h>
 
@@ -13,17 +15,35 @@ ProgramPipeline::~ProgramPipeline()
   glDeleteProgramPipelines(1, &m_id);
 }
 
-void ProgramPipeline::setBit(const Program &program) const
+void ProgramPipeline::useStages(const Program &program, std::initializer_list<ShaderType> stages) const
 {
-  // switch (program.getType())
-  // {
-  // case ShaderType::Vertex:
-  //   glUseProgramStages(m_id, GL_VERTEX_SHADER_BIT, program.getID());
-  //   break;
-  // case ShaderType::Fragment:
-  //   glUseProgramStages(m_id, GL_FRAGMENT_SHADER_BIT, program.getID());
-  //   break;
-  // }
+  if (!program.isSeparable())
+  {
+    throw std::runtime_error("Program is not separable");
+  }
+
+  if (!program.hasShaders(stages))
+  {
+    throw std::runtime_error("Program does not have required shaders");
+  }
+
+  uint32_t bits = 0;
+  for (auto stage : stages)
+  {
+    switch (stage)
+    {
+    case ShaderType::Vertex:
+      bits |= GL_VERTEX_SHADER_BIT;
+      break;
+    case ShaderType::Fragment:
+      bits |= GL_FRAGMENT_SHADER_BIT;
+      break;
+    default:
+      break;
+    }
+  }
+
+  glUseProgramStages(m_id, bits, program.getID());
 }
 
 void ProgramPipeline::bind() const

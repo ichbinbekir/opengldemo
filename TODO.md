@@ -4,5 +4,6 @@
 
 ### yapıların sınıflara ayrılması lazım
 # pch tanımlanabilir
-#### shaderlar hotreload olurken hata var (asset manager lazım)
-## sınıfların kopyalanmalarını önlemek lazım.
+#### shaderların hotreloadı için asset manager lazım
+## sınıfların kopyalanmalarını önlemek lazım
+## program sınıfına uniformları esnek yönetebilecek farklı bi yapı ekle

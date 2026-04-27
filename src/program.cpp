@@ -47,12 +47,19 @@ void Program::link(bool separable, std::initializer_list<std::reference_wrapper<
   glGetProgramiv(m_id, GL_LINK_STATUS, &success);
   if (!success)
   {
+    m_linkedTypes.clear();
     int32_t len;
     glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &len);
 
     std::vector<char> log(len);
     glGetProgramInfoLog(m_id, len, nullptr, log.data());
     throw std::runtime_error(std::format("Program could not be link: {}", log.data()));
+  }
+
+  m_linkedTypes.clear();
+  for (const auto &[type, id] : m_attached)
+  {
+    m_linkedTypes.insert(type);
   }
 }
 
@@ -82,6 +89,18 @@ uint32_t Program::getUniformLocation(const std::string &name) const
 void Program::setUniformMatrix2fv(int location, const float *data, uint32_t count, bool transpose) const
 {
   glProgramUniformMatrix2fv(m_id, location, count, transpose, data);
+}
+
+bool Program::hasShaders(std::initializer_list<ShaderType> types) const
+{
+  for (const auto &type : types)
+  {
+    if (m_linkedTypes.find(type) == m_linkedTypes.end())
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 std::vector<ShaderType> Program::getAttachedTypes() const

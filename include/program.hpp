@@ -4,6 +4,7 @@
 #include <string_view>
 #include <map>
 #include <vector>
+#include <set>
 
 enum class ShaderType;
 
@@ -15,6 +16,7 @@ private:
   uint32_t m_id;
   bool m_separable;
   std::map<ShaderType, uint32_t> m_attached;
+  std::set<ShaderType> m_linkedTypes;
 
 public:
   Program();
@@ -29,5 +31,6 @@ public:
 
   uint32_t getID() const { return m_id; }
   bool isSeparable() const { return m_separable; };
+  bool hasShaders(std::initializer_list<ShaderType> types) const;
   std::vector<ShaderType> getAttachedTypes() const;
 };

@@ -102,7 +102,7 @@ int main()
     spdlog::error(e.what());
     return EXIT_FAILURE;
   }
-  
+
   prog.use();
 
   bool vert_reload = false;
@@ -148,8 +148,6 @@ int main()
   spdlog::info("Main loop ...");
   while (!glfwWindowShouldClose(window))
   {
-    prog.setUniformMatrix2fv(rotUni, rotate(angle).data());
-
     bool should_relink = false;
     if (vert_reload)
     {
@@ -166,7 +164,6 @@ int main()
       }
       vert_reload = false;
     }
-
     if (frag_reload)
     {
       try
@@ -182,7 +179,6 @@ int main()
       }
       frag_reload = false;
     }
-
     if (should_relink)
     {
       try
@@ -197,8 +193,8 @@ int main()
       }
     }
 
+    prog.setUniformMatrix2fv(rotUni, rotate(angle).data());
     glClear(GL_COLOR_BUFFER_BIT);
-
     glDrawArrays(GL_TRIANGLE_FAN, 0, std::size(vertices) / 3);
 
     ImGui_ImplOpenGL3_NewFrame();
