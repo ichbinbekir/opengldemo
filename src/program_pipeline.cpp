@@ -27,7 +27,7 @@ void ProgramPipeline::useStages(const Program &program, const std::vector<Shader
     throw std::runtime_error("Program does not have required shaders");
   }
 
-  GLbitfield bits = 0;
+  uint32_t bits = 0;
   for (auto stage : stages)
   {
     switch (stage)

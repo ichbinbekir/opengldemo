@@ -6,3 +6,5 @@
 # pch tanımlanabilir
 ## sınıfların kopyalanmalarını önlemek lazım
 ## program sınıfına uniformları esnek yönetebilecek farklı bi yapı ekle
+
+#### matematik kütüphanesi yazılmalı
