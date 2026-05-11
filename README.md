@@ -66,13 +66,6 @@ Uygulamayı çalıştırdığınızda karşınıza dönen bir kare ve bir ImGui 
 - `vendor/`: Üçüncü taraf kütüphaneler (ImGui, Glad, FileWatch).
 - `docs/`: Proje dokümantasyonu ve görseller.
 
-## Gelecek Planları (TODO)
-
-- [ ] Defer sistemi ile kaynak yönetimi (RAII ötesi kapatma işlemleri).
-- [ ] Matematik kütüphanesinin tamamlanması.
-- [ ] VAO/VBO yapılarının sınıflara soyutlanması.
-- [ ] ImGui entegrasyonunun daha esnek hale getirilmesi.
-
 ## Lisans
 
 Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
