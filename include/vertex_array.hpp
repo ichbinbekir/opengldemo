@@ -9,14 +9,6 @@ public:
   VertexArray();
   ~VertexArray();
 
-  // Prevent copying
-  VertexArray(const VertexArray&) = delete;
-  VertexArray& operator=(const VertexArray&) = delete;
-
-  // Allow moving
-  VertexArray(VertexArray&& other) noexcept;
-  VertexArray& operator=(VertexArray&& other) noexcept;
-
   void bind() const;
   void unbind() const;
 
@@ -28,5 +20,5 @@ public:
   uint32_t getID() const { return m_id; }
 
 private:
-  uint32_t m_id = 0;
+  uint32_t m_id;
 };
