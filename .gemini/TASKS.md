@@ -24,6 +24,7 @@ Bu dosya, projenin mimari temellerini, mevcut durumunu ve gelecek planlarını �
 - [x] Başlangıç seviyesinde ImGui entegrasyonu.
 - [x] Temel matematik kütüphanesi (Matrix2x2) taslağı.
 - [x] Proje dokümantasyonu (README.md) ve kodlama standartları (STYLE.md).
+- [x] **Nesne Soyutlaması:** VAO (VertexArray) ve VBO (Buffer) için temel DSA tabanlı sınıfların oluşturulması ve main.cpp entegrasyonu.
 
 ## 🚀 Gelecek Görevler (TODO)
 
@@ -33,7 +34,6 @@ Bu dosya, projenin mimari temellerini, mevcut durumunu ve gelecek planlarını �
 - [ ] **Precompiled Headers (PCH):** Derleme sürelerini hızlandırmak için PCH desteği eklenmesi.
 
 ### 🎨 Grafik ve Soyutlama
-- [ ] **Nesne Soyutlaması:** VAO, VBO, EBO gibi OpenGL yapılarını temsil eden özel C++ sınıflarının oluşturulması.
 - [ ] **Uniform Yönetimi:** `Program` sınıfı içerisinde uniform değişkenlerini daha esnek ve performanslı yönetebilecek bir yapı (cache sistemi vb.) kurulması.
 - [ ] **Matematik Kütüphanesi:** `math/` altındaki kütüphanenin genişletilmesi (Matrix4x4, Vector3 vb.).
 

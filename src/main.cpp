@@ -10,6 +10,8 @@
 #include "program.hpp"
 #include "program_pipeline.hpp"
 #include "asset_manager.hpp"
+#include "buffer.hpp"
+#include "vertex_array.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
@@ -75,6 +77,8 @@ int main()
   spdlog::info("Renderer: {}", (const char *)glGetString(GL_RENDERER));
   spdlog::info("Version: {}", (const char *)glGetString(GL_VERSION));
 
+  // Resync viewport for graphical overflows
+  // For KDE because KDE creating window any size. different by 800 width, 600 height
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
@@ -93,19 +97,18 @@ int main()
         rotUni = p.getUniformLocation("rot");
       });
 
-  uint32_t vao, vbo;
-  glCreateVertexArrays(1, &vao);
-  glCreateBuffers(1, &vbo);
+  VertexArray vao;
+  Buffer vbo;
 
-  glNamedBufferData(vbo, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  vbo.setData(vertices, sizeof(vertices));
 
-  glEnableVertexArrayAttrib(vao, 0);
-  glVertexArrayAttribBinding(vao, 0, 0);
-  glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, false, 0);
+  vao.enableAttribute(0);
+  vao.setAttributeBinding(0, 0);
+  vao.setAttributeFormat(0, 3, GL_FLOAT, false, 0);
 
-  glVertexArrayVertexBuffer(vao, 0, vbo, 0, 3 * sizeof(float));
+  vao.setVertexBuffer(0, vbo, 0, 3 * sizeof(float));
 
-  glBindVertexArray(vao);
+  vao.bind();
 
   float angle = 0.0f;
 
