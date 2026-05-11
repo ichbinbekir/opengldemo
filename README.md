@@ -9,7 +9,6 @@ Modern OpenGL (DSA), C++23 ve shader sıcak yenileme (hot-reload) özelliklerine
 - **Modern OpenGL (4.5+ DSA):** Direct State Access (DSA) kullanarak daha temiz ve verimli nesne yönetimi (VAO, VBO, vb.).
 - **Sıcak Yenileme (Hot-Reload):** Shader dosyalarında yaptığınız değişiklikler, uygulama çalışırken anında algılanır ve otomatik olarak yeniden derlenip bağlanır.
 - **Entegre UI:** Geliştirme sürecini kolaylaştırmak için [ImGui](https://github.com/ocornut/imgui) entegrasyonu mevcuttur.
-- **Asset Yönetimi:** Shader ve Program nesneleri için merkezi bir `AssetManager` sistemi.
 - **Hızlı Loglama:** [spdlog](https://github.com/gabime/spdlog) ile yüksek performanslı günlük tutma.
 - **C++23:** En güncel C++ standartlarını (C++23) temel alan modern kod yapısı.
 
@@ -60,7 +59,6 @@ Uygulamayı çalıştırdığınızda karşınıza dönen bir kare ve bir ImGui 
 ## Proje Yapısı
 
 - `include/`: Başlık (header) dosyaları.
-  - `math/`: Özel matematik kütüphanesi (geliştirilme aşamasında).
 - `src/`: Kaynak kodlar.
 - `shaders/`: GLSL shader dosyaları.
 - `vendor/`: Üçüncü taraf kütüphaneler (ImGui, Glad, FileWatch).

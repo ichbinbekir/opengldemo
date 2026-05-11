@@ -1,22 +1,5 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-#include <spdlog/spdlog.h>
-
-#include "util.hpp"
+#include "app.hpp"
 #include "shader.hpp"
-#include "program.hpp"
-#include "program_pipeline.hpp"
-#include "asset_manager.hpp"
-#include "buffer.hpp"
-#include "vertex_array.hpp"
-
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-  glViewport(0, 0, width, height);
-}
 
 float vertices[] = {
     -0.5f,
@@ -46,79 +29,40 @@ std::array<float, 4> rotate(float angle)
 
 int main()
 {
-  spdlog::info("Initializing");
-  if (!glfwInit())
+  std::optional<App> app;
+  std::optional<Shader> shader;
+  try
   {
-    spdlog::error("GLFW could not be load");
+    app.emplace("OpenGL Demo");
+    shader.emplace("shaders/test.vert", "shaders/test.frag");
+  }
+  catch (const std::exception &e)
+  {
+    spdlog::error(e.what());
     return EXIT_FAILURE;
   }
 
-  // TODO: defer glfwTerminate();
-
-  auto window = glfwCreateWindow(800, 600, "OpenGL Demo", NULL, NULL);
-  if (!window)
-  {
-    spdlog::error("Window could not be create");
-    return EXIT_FAILURE;
-  }
-  glfwMakeContextCurrent(window);
-  // glfwSwapInterval(0);
-
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-  {
-    spdlog::error("GLAD could not load");
-    return EXIT_FAILURE;
-  }
-
-  ImGui::CreateContext();
-  ImGui_ImplGlfw_InitForOpenGL(window, true);
-  ImGui_ImplOpenGL3_Init();
-
-  spdlog::info("Renderer: {}", (const char *)glGetString(GL_RENDERER));
-  spdlog::info("Version: {}", (const char *)glGetString(GL_VERSION));
-
-  // Resync viewport for graphical overflows
-  // For KDE because KDE creating window any size. different by 800 width, 600 height
-  int width, height;
-  glfwGetFramebufferSize(window, &width, &height);
-  glViewport(0, 0, width, height);
-
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-  glClearColor(0.15, 0.15, 0.15, 1);
-
-  uint32_t rotUni = 0;
-  auto prog = AssetManager::instance().createProgram(
-      "test", false,
-      {{"shaders/test.vert", ShaderType::Vertex},
-       {"shaders/test.frag", ShaderType::Fragment}},
-      [&rotUni](Program &p)
-      {
-        rotUni = p.getUniformLocation("rot");
-      });
-
-  VertexArray vao;
-  Buffer vbo;
-
-  vbo.setData(vertices, sizeof(vertices));
-
-  vao.enableAttribute(0);
-  vao.setAttributeBinding(0, 0);
-  vao.setAttributeFormat(0, 3, GL_FLOAT, false, 0);
-
-  vao.setVertexBuffer(0, vbo, 0, 3 * sizeof(float));
-
-  vao.bind();
-
+  shader->use();
   float angle = 0.0f;
 
-  spdlog::info("Main loop ...");
-  while (!glfwWindowShouldClose(window))
-  {
-    AssetManager::instance().update();
+  uint32_t vao, vbo;
+  glCreateVertexArrays(1, &vao);
+  glCreateBuffers(1, &vbo);
 
-    prog->use();
-    prog->setUniformMatrix2fv(rotUni, rotate(angle).data());
+  glNamedBufferData(vbo, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glEnableVertexArrayAttrib(vao, 0);
+  glVertexArrayAttribBinding(vao, 0, 0);
+  glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, false, 0);
+
+  glVertexArrayVertexBuffer(vao, 0, vbo, 0, 3 * sizeof(float));
+
+  glBindVertexArray(vao);
+
+  spdlog::info("Main loop ...");
+  while (!glfwWindowShouldClose(app->window))
+  {
+    shader->setMat2("rot", rotate(angle).data());
 
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLE_FAN, 0, std::size(vertices) / 3);
@@ -136,12 +80,13 @@ int main()
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(app->window);
     glfwPollEvents();
   }
 
-  // TODO: close all handlers, unload ram, vram. we can do with defer system
+  glBindVertexArray(0);
 
-  glfwTerminate(); // TODO: remove line after defer system
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
   return EXIT_SUCCESS;
 }
